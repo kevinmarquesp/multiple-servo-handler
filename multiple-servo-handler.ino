@@ -19,12 +19,14 @@ void setup(void) {
 
 void loop(void) {
     Servos.loopUpdate();
+
     run();
     display();
 }
 
 void run(void) {
-    Servos.move(0, 90, 100);
+    Servos.move(0, 180, 100);
+    Servos.move(0, 0, 100);
 }
 
 void display(void) {
