@@ -5,13 +5,13 @@ BAUDRATE ?= 9600
 default: lint compile upload
 
 lint:
-	@cplint --extensions=ino --filter=-legal/copyright *.ino || echo '[WARNING]: cpplint is not installed!'
+	@cpplint --extensions=ino --filter=-legal/copyright *.ino || echo '[WARNING]: cpplint is not installed!'
 
 compile:
 	@arduino-cli compile -b ${BOARD}
 
 upload:
-	@arduino-cli upload -b ${BOARD} --port ${BOARD} .
+	@arduino-cli compile -u -b ${BOARD} --port ${PORT} ./
 
 monitor:
 	@python monitor.py --port ${PORT} --baudrate ${BAUDRATE}
