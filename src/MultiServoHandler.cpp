@@ -34,23 +34,38 @@ void MultiServoHandler::loopUpdate(void) {
     this->_cMill = millis();
 }
 
-void MultiServoHandler::move(uint8_t index, uint8_t deg, uint16_t waitDelay = 0) {
+void MultiServoHandler::move(uint8_t index, uint8_t deg, uint16_t sleep = 0) {
     this->_validadeDegValue(&deg, index);
     uint8_t cPos = this->Motor[index].read();
 
-    if (not waitDelay or deg == cPos)
+    if (not sleep or deg == cPos)
         return;
 
-    if (deg > cPos) {
-        for (cPos; cPos <= deg; cPos++) {
+    if (this->_cMill - this->_tasks[index] >= sleep) {
+
+        this->_tasks[index] = this->_cMill;
+        this->Motor[index].write(cPos);
+
+        if (deg > cPos) {
             this->Motor[index].write(cPos);
-            delay(waitDelay);
+            cPos++;
+
+        } else if (deg < cPos) {
+            cPos--;
         }
 
-    } else if (deg < cPos) {
-        for (cPos; cPos >= deg; cPos--) {
-            this->Motor[index].write(cPos);
-            delay(waitDelay);
-        }
     }
+
+    /* if (deg > cPos) { */
+    /*     for (cPos; cPos <= deg; cPos++) { */
+    /*         this->Motor[index].write(cPos); */
+    /*         delay(waitDelay); */
+    /*     } */
+
+    /* } else if (deg < cPos) { */
+    /*     for (cPos; cPos >= deg; cPos--) { */
+    /*         this->Motor[index].write(cPos); */
+    /*         delay(waitDelay); */
+    /*     } */
+    /* } */
 }
