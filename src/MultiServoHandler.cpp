@@ -1,7 +1,14 @@
 #include "MultiServoHandler.h"
 
-MultiServoHandler::config(uint8_t amount, uint8_t* pins, uint8_t* minDeg, uint8_t* maxDeg) {
-    this->_amount = amount;
+void MultiServoHandler::_validadeDegValue(uint8_t* deg, uint8_t index) {
+    if (*deg < this->_minDeg[index])
+        *deg = this->_minDeg[index];
+
+    else if (*deg > this->_maxDeg[index])
+        *deg = this->_maxDeg[index];
+}
+
+void MultiServoHandler::config(uint8_t amount, uint8_t* pins, uint8_t* minDeg, uint8_t* maxDeg) {
     this->_minDeg = new uint8_t[amount];
     this->_maxDeg = new uint8_t[amount];
     this->_tasks = new uint64_t[amount];
@@ -16,27 +23,25 @@ MultiServoHandler::config(uint8_t amount, uint8_t* pins, uint8_t* minDeg, uint8_
     }
 }
 
-MultiServoHandler::loopUpdate(void) {
+void MultiServoHandler::loopUpdate(void) {
     this->_time = millis();
 }
 
-MultiServoHandler::move(uint8_t index, uint8_t degValue, uint16_t waitDelay = 0) {
-    degValue = degValue < this->_minDeg[index] ? this->_minDeg[index] : degValue;
-    degValue = degValue > this->_maxDeg[index] ? this->_maxDeg[index] : degValue;
-
+void MultiServoHandler::move(uint8_t index, uint8_t deg, uint16_t waitDelay = 0) {
+    this->_validadeDegValue(&deg, index);
     uint8_t currPos = this->Motor[index].read();
 
-    if (not waitDelay or degValue == currPos)
+    if (not waitDelay or deg == currPos)
         return;
 
-    if (degValue > currPos) {
-        for (currPos; currPos <= degValue; currPos++) {
+    if (deg > currPos) {
+        for (currPos; currPos <= deg; currPos++) {
             this->Motor[index].write(currPos);
             delay(waitDelay);
         }
 
-    } else if (degValue < currPos) {
-        for (currPos; currPos >= degValue; currPos--) {
+    } else if (deg < currPos) {
+        for (currPos; currPos >= deg; currPos--) {
             this->Motor[index].write(currPos);
             delay(waitDelay);
         }
