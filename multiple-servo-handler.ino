@@ -16,7 +16,7 @@ void setup(void) {
 }
 
 void loop(void) {
-    Arm.update();
+    Arm.update(millis());
 
     debug_display();
 }

@@ -11,10 +11,14 @@ namespace MSH {
         bool isDone;
 
         void setupValues(uint8_t min, uint8_t max);
-        // void move(uint8_t deg, uint16_t sleep = 0);
+        void move(uint64_t procMillis, uint8_t deg, uint16_t sleep = 0);
+
     private:
         uint8_t min;
         uint8_t max;
+        uint64_t process;
+
+        void validateDegValue(uint8_t *deg);
     };
 
     class Handler {
@@ -24,13 +28,14 @@ namespace MSH {
         Handler(uint8_t amount, uint8_t* minDeg, uint8_t* maxDeg);
         void attachAll(uint8_t* pins);
         void detachAll();
-        void update(void);
+        void update(uint64_t procMillis);
         // void set(uint8_t mi, uint16_t sleep);
         // void start(void);
 
     private:
         uint8_t amount;
-        // bool moveLock;
+        uint8_t* moveSet;
+        bool moveLock;
     };
 } // namespace MSH
 
