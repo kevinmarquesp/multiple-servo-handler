@@ -20,7 +20,7 @@ def main():
         arduino = Serial(port=args.port, baudrate=args.baudrate)
 
         while True:
-            line = str(arduino.readline(), 'utf-8')
+            line = str(arduino.readline(), 'utf-8').replace('\n', '')
             print(line)
 
     except KeyboardInterrupt:
