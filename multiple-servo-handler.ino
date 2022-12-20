@@ -12,15 +12,23 @@ void debug_display(void);
 void setup(void) {
     Serial.begin(9600);
 
+    // -----------------
     Arm.attachAll(pins);
     Arm.moveSlots(16);
-
+    // -----------------
     Arm.set(0, 90, 100);
+    Arm.set(1, 90, 100);
     Arm.load();
+
+    Arm.set(2, 90, 100);
+    Arm.load();
+    // -----------------
+    Arm.start();
+    // -----------------
 }
 
 void loop(void) {
-    /* debug_display(); */
+    debug_display();
 }
 
 void debug_display(void) {

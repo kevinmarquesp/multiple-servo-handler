@@ -7,7 +7,7 @@
 
 namespace MSH {
     typedef struct Motion {
-        bool used = false;
+        bool available = false;
         uint8_t deg;
         uint16_t sleep;
     } Motion;
@@ -36,13 +36,17 @@ namespace MSH {
         void detachAll();
         void moveSlots(uint8_t mvAmt);
         void set(uint8_t motor, uint8_t deg, uint16_t sleep);
-        // void start(void);
+        void load(void);
+        void start(void);
 
     private:
+        bool lockSettings;
         uint8_t amt;
-        uint8_t mvCount;
-        Motion* memSlot;
-        uint8_t** mvSlots;
+        uint8_t amtSlots;
+        uint8_t alocatedSlots;
+        uint8_t selectedSlot;
+        Motion* MemSlot;
+        Motion** MoveSet;
     };
 } // namespace MSH
 
