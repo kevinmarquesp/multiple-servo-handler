@@ -59,9 +59,11 @@ void MSH::ServoAlt::validateDegValue(uint8_t* deg) {
 
 MSH::Handler::Handler(uint8_t amt, uint8_t* minDeg, uint8_t* maxDeg) {
     this->Motor = new ServoAlt[amt];
+    this->memSlot = new Motion[amt];
+
     this->amt = amt;
 
-    for (uint8_t i = 0; i < amt; ++i)
+    for (uint8_t i = 0; i < amt; i++) 
         this->Motor[i].setupValues(minDeg[i], maxDeg[i]);
 }
 
@@ -77,6 +79,24 @@ void MSH::Handler::detachAll(void) {
     for (uint8_t i = 0; i < this->amt; i++) {
         this->Motor[i].detach();
     }
+}
+
+void MSH::Handler::moveSlots(uint8_t mvAmt) {
+    this->mvSlots = new uint8_t*[mvAmt];
+
+    for (uint8_t i = 0; i < mvAmt; i++) {
+        this->mvSlots[i] = new uint8_t[this->amt];
+    }
+}
+
+void MSH::Handler::set(uint8_t motor, uint8_t deg, uint16_t sleep) {
+    Motion setting;
+
+    setting.used = true;
+    setting.deg = deg;
+    setting.sleep = sleep;
+
+    this->memSlot[motor] = setting;
 }
 
 // End of  <MSH::Handler>

@@ -6,6 +6,12 @@
 
 
 namespace MSH {
+    typedef struct Motion {
+        bool used = false;
+        uint8_t deg;
+        uint16_t sleep;
+    } Motion;
+
     class ServoAlt: public Servo {
     public:
         bool isDone;
@@ -28,12 +34,15 @@ namespace MSH {
         Handler(uint8_t amount, uint8_t* minDeg, uint8_t* maxDeg);
         void attachAll(uint8_t* pins);
         void detachAll();
-        // void set(uint8_t mi, uint16_t sleep);
+        void moveSlots(uint8_t mvAmt);
+        void set(uint8_t motor, uint8_t deg, uint16_t sleep);
         // void start(void);
 
     private:
         uint8_t amt;
-        uint8_t** moveSet;
+        uint8_t mvCount;
+        Motion* memSlot;
+        uint8_t** mvSlots;
     };
 } // namespace MSH
 

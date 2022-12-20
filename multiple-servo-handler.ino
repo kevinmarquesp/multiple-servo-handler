@@ -13,6 +13,10 @@ void setup(void) {
     Serial.begin(9600);
 
     Arm.attachAll(pins);
+    Arm.moveSlots(16);
+
+    Arm.set(0, 90, 100);
+    Arm.load();
 }
 
 void loop(void) {
