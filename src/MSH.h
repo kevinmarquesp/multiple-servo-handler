@@ -37,7 +37,8 @@ namespace MSH {
         void moveSlots(uint8_t mvAmt);
         void set(uint8_t motor, uint8_t deg, uint16_t sleep);
         void load(void);
-        void start(void);
+        void isReady(void);
+        void update(uint64_t currMillis);
 
     private:
         bool lockSettings;

@@ -1,4 +1,6 @@
-#define AMOUNT 6
+#define AMOUNT 255
+#define MOVES 255
+
 #include "src/MSH.h"
 
 uint8_t maxDeg[AMOUNT] = {180, 180, 180, 180, 180, 180};
@@ -14,20 +16,21 @@ void setup(void) {
 
     // -----------------
     Arm.attachAll(pins);
-    Arm.moveSlots(16);
+    Arm.moveSlots(MOVES);
     // -----------------
     Arm.set(0, 90, 100);
-    Arm.set(1, 90, 100);
+    Arm.set(1, 90, 50);
     Arm.load();
 
-    Arm.set(2, 90, 100);
+    Arm.set(2, 90, 10);
     Arm.load();
     // -----------------
-    Arm.start();
+    Arm.isReady();
     // -----------------
 }
 
 void loop(void) {
+    Arm.update(millis());
     debug_display();
 }
 

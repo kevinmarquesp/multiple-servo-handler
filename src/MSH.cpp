@@ -107,18 +107,43 @@ void MSH::Handler::set(uint8_t motor, uint8_t deg, uint16_t sleep) {
 
 void MSH::Handler::load(void) {
     if (not this->lockSettings) {
-        for (uint8_t i = 0; i < this->amt; i++)
+        for (uint8_t i = 0; i < this->amt; i++) {
             this->MoveSet[this->selectedSlot][i] = this->MemSlot[i];
+            this->MemSlot[i].available = false;
+        }
 
-        if (this->selectedSlot < this->alocatedSlots)
-            this->selectedSlot++;
+        this->selectedSlot++;
     }
 }
 
-void MSH::Handler::start(void) {
+void MSH::Handler::isReady(void) {
     this->lockSettings = true;
-    this->amtSlots = this->selectedSlot + 1;
+    this->amtSlots = this->selectedSlot;
     this->selectedSlot = 0;
+}
+
+void MSH::Handler::update(uint64_t currMillis) {
+    if (this->lockSettings and this->selectedSlot < this->amtSlots) {
+        uint8_t availableList = 0;
+        uint8_t doneList = 0;
+        Motion* currSet = this->MoveSet[this->selectedSlot];
+
+        for (uint8_t i = 0; i < this->amt; i++)
+            if (currSet[i].available)
+                availableList++;
+
+        for (uint8_t i = 0; i < this->amt; i++) {
+            if (currSet[i].available) {
+                if (this->Motor[i].read() == currSet[i].deg)
+                    doneList++;
+                else
+                    this->Motor[i].move(currMillis, currSet[i].deg, currSet[i].sleep);
+            }
+        }
+
+        if (availableList == doneList)
+            this->selectedSlot++;
+    }
 }
 
 // End of  <MSH::Handler>
