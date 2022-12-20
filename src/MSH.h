@@ -28,14 +28,12 @@ namespace MSH {
         Handler(uint8_t amount, uint8_t* minDeg, uint8_t* maxDeg);
         void attachAll(uint8_t* pins);
         void detachAll();
-        void update(uint64_t procMillis);
         // void set(uint8_t mi, uint16_t sleep);
         // void start(void);
 
     private:
-        uint8_t amount;
-        uint8_t* moveSet;
-        bool moveLock;
+        uint8_t amt;
+        uint8_t** moveSet;
     };
 } // namespace MSH
 
