@@ -39,11 +39,12 @@ namespace MSH {
         void load(void);
         void isReady(void);
         void update(uint64_t currMillis);
+        void setRepeat(bool value);
 
     private:
         bool lockSettings;
+        bool repeat;
         uint8_t amt;
-        uint8_t amtSlots;
         uint8_t alocatedSlots;
         uint8_t selectedSlot;
         Motion* MemSlot;

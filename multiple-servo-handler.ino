@@ -1,11 +1,11 @@
-#define AMOUNT 255
-#define MOVES 255
+#define AMOUNT 3
+#define MOVES 2
 
 #include "src/MSH.h"
 
-uint8_t maxDeg[AMOUNT] = {180, 180, 180, 180, 180, 180};
-uint8_t minDeg[AMOUNT] = { 20,  20,  20,  20,  20,  20};
-uint8_t pins[AMOUNT] =   {  4,   5,   6,   7,   8,   9};
+uint8_t maxDeg[AMOUNT] = {180, 180, 180};
+uint8_t minDeg[AMOUNT] = {  0,   0,   0};
+uint8_t pins[AMOUNT] =   {  4,   5,   6};
 
 MSH::Handler Arm(AMOUNT, minDeg, maxDeg);
 
@@ -18,14 +18,17 @@ void setup(void) {
     Arm.attachAll(pins);
     Arm.moveSlots(MOVES);
     // -----------------
-    Arm.set(0, 90, 100);
-    Arm.set(1, 90, 50);
+    Arm.set(0, 180, 5);
+    Arm.set(1, 180, 10);
+    Arm.set(2, 180, 5);
     Arm.load();
-
-    Arm.set(2, 90, 10);
+    Arm.set(0, 0, 5);
+    Arm.set(1, 0, 10);
+    Arm.set(2, 0, 5);
     Arm.load();
     // -----------------
     Arm.isReady();
+    Arm.setRepeat(true);
     // -----------------
 }
 

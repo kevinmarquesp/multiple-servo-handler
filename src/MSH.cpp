@@ -60,9 +60,10 @@ MSH::Handler::Handler(uint8_t amt, uint8_t* minDeg, uint8_t* maxDeg) {
     this->Motor = new ServoAlt[amt];
     this->MemSlot = new Motion[amt];
 
+    this->repeat = false;
     this->amt = amt;
 
-    this->amtSlots = 0;
+    this->alocatedSlots = 0;
     this->selectedSlot = 0;
     this->alocatedSlots = 0;
 
@@ -88,9 +89,8 @@ void MSH::Handler::moveSlots(uint8_t mvAmt) {
     this->alocatedSlots = mvAmt;
     this->MoveSet = new Motion*[mvAmt];
 
-    for (uint8_t i = 0; i < mvAmt; i++) {
+    for (uint8_t i = 0; i < mvAmt; i++)
         this->MoveSet[i] = new Motion[this->amt];
-    }
 }
 
 void MSH::Handler::set(uint8_t motor, uint8_t deg, uint16_t sleep) {
@@ -106,44 +106,60 @@ void MSH::Handler::set(uint8_t motor, uint8_t deg, uint16_t sleep) {
 }
 
 void MSH::Handler::load(void) {
-    if (not this->lockSettings) {
-        for (uint8_t i = 0; i < this->amt; i++) {
-            this->MoveSet[this->selectedSlot][i] = this->MemSlot[i];
-            this->MemSlot[i].available = false;
-        }
+    Serial.println(this->alocatedSlots);
 
-        this->selectedSlot++;
+    if (this->lockSettings)
+        return;
+
+    for (uint8_t i = 0; i < this->amt; i++) {
+        this->MoveSet[this->selectedSlot][i] = this->MemSlot[i];
+        this->MemSlot[i].available = false;
     }
+
+    this->selectedSlot++;
 }
 
 void MSH::Handler::isReady(void) {
     this->lockSettings = true;
-    this->amtSlots = this->selectedSlot;
+    this->alocatedSlots = this->selectedSlot;
     this->selectedSlot = 0;
 }
 
 void MSH::Handler::update(uint64_t currMillis) {
-    if (this->lockSettings and this->selectedSlot < this->amtSlots) {
-        uint8_t availableList = 0;
-        uint8_t doneList = 0;
-        Motion* currSet = this->MoveSet[this->selectedSlot];
+    if (not this->lockSettings)
+        return;
 
-        for (uint8_t i = 0; i < this->amt; i++)
-            if (currSet[i].available)
-                availableList++;
-
-        for (uint8_t i = 0; i < this->amt; i++) {
-            if (currSet[i].available) {
-                if (this->Motor[i].read() == currSet[i].deg)
-                    doneList++;
-                else
-                    this->Motor[i].move(currMillis, currSet[i].deg, currSet[i].sleep);
-            }
-        }
-
-        if (availableList == doneList)
-            this->selectedSlot++;
+    if (this->selectedSlot == this->alocatedSlots) {
+        if (this->repeat)
+            this->selectedSlot = 0;
+        else
+            return;
     }
+
+    uint8_t availableList = 0;
+    uint8_t doneList = 0;
+    Motion* currSet = this->MoveSet[this->selectedSlot];
+
+    for (uint8_t i = 0; i < this->amt; i++)
+        if (currSet[i].available)
+            availableList++;
+
+    for (uint8_t i = 0; i < this->amt; i++) {
+        if (currSet[i].available) {
+            if (this->Motor[i].read() == currSet[i].deg)
+                doneList++;
+            else
+                this->Motor[i].move(currMillis, currSet[i].deg, currSet[i].sleep);
+        }
+    }
+
+    if (availableList == doneList)
+        if (this->selectedSlot < this->alocatedSlots)
+            this->selectedSlot++;
+}
+
+void MSH::Handler::setRepeat(bool value) {
+    this->repeat = value;
 }
 
 // End of  <MSH::Handler>
