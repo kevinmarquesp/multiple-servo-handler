@@ -7,7 +7,7 @@ uint8_t maxDeg[AMOUNT] = {180, 180, 180};
 uint8_t minDeg[AMOUNT] = {  0,   0,   0};
 uint8_t pins[AMOUNT] =   {  4,   5,   6};
 
-MSH::Handler Arm(AMOUNT, minDeg, maxDeg);
+ServoHandler Arm(AMOUNT, minDeg, maxDeg);
 
 void debug_display(void);
 

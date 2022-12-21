@@ -4,13 +4,13 @@
 
 // public methods
 
-void MSH::ServoAlt::setupValues(uint8_t min, uint8_t max) {
+void Lib::ServoAlt::setupValues(uint8_t min, uint8_t max) {
     this->min = min;
     this->max = max;
     this->write(min);
 }
 
-void MSH::ServoAlt::move(uint64_t procMillis, uint8_t deg, uint16_t sleep) {
+void Lib::ServoAlt::move(uint64_t procMillis, uint8_t deg, uint16_t sleep) {
     this->validateDegValue(&deg);
 
     if (not sleep)
@@ -35,7 +35,7 @@ void MSH::ServoAlt::move(uint64_t procMillis, uint8_t deg, uint16_t sleep) {
 
 // private methods
 
-void MSH::ServoAlt::validateDegValue(uint8_t* deg) {
+void Lib::ServoAlt::validateDegValue(uint8_t* deg) {
     if (*deg < this->min)
         *deg = this->min;
     else if (*deg > this->max)
@@ -44,13 +44,13 @@ void MSH::ServoAlt::validateDegValue(uint8_t* deg) {
 
 // End of <MSH::ServoAlt>
 
-// <MSH::Handler> -> constructor
+// <ServoHandler> -> constructor
 
-MSH::Handler::Handler(uint8_t amt, uint8_t* minDeg, uint8_t* maxDeg) {
+ServoHandler::ServoHandler(uint8_t amt, uint8_t* minDeg, uint8_t* maxDeg) {
     this->amt = amt;
 
-    this->Motor = new ServoAlt[amt];
-    this->MemSlot = new Motion[amt];
+    this->Motor = new Lib::ServoAlt[amt];
+    this->MemSlot = new Lib::Motion[amt];
 
     for (uint8_t i = 0; i < amt; i++) 
         this->Motor[i].setupValues(minDeg[i], maxDeg[i]);
@@ -58,30 +58,30 @@ MSH::Handler::Handler(uint8_t amt, uint8_t* minDeg, uint8_t* maxDeg) {
 
 // public methods
 
-void MSH::Handler::attachAll(uint8_t* pins) {
+void ServoHandler::attachAll(uint8_t* pins) {
     for (uint8_t i = 0; i < this->amt; i++)
         this->Motor[i].attach(pins[i]);
 }
 
-void MSH::Handler::detachAll(void) {
+void ServoHandler::detachAll(void) {
     uint8_t i;
     for (uint8_t i = 0; i < this->amt; i++)
         this->Motor[i].detach();
 }
 
-void MSH::Handler::moveSlots(uint8_t mvAmt) {
+void ServoHandler::moveSlots(uint8_t mvAmt) {
     this->alocatedSlots = mvAmt;
-    this->MoveSet = new Motion*[mvAmt];
+    this->MoveSet = new Lib::Motion*[mvAmt];
 
     for (uint8_t i = 0; i < mvAmt; i++)
-        this->MoveSet[i] = new Motion[this->amt];
+        this->MoveSet[i] = new Lib::Motion[this->amt];
 }
 
-void MSH::Handler::set(uint8_t motor, uint8_t deg, uint16_t sleep) {
+void ServoHandler::set(uint8_t motor, uint8_t deg, uint16_t sleep) {
     if (this->lockSettings)
         return;
 
-    Motion setting;
+    Lib::Motion setting;
 
     setting.available = true;
     setting.deg = deg;
@@ -90,7 +90,7 @@ void MSH::Handler::set(uint8_t motor, uint8_t deg, uint16_t sleep) {
     this->MemSlot[motor] = setting;
 }
 
-void MSH::Handler::load(void) {
+void ServoHandler::load(void) {
     if (this->lockSettings or this->selectedSlot >= this->alocatedSlots)
         return;
 
@@ -102,13 +102,13 @@ void MSH::Handler::load(void) {
     this->selectedSlot++;
 }
 
-void MSH::Handler::isReady(void) {
+void ServoHandler::isReady(void) {
     this->lockSettings = true;
     this->alocatedSlots = this->selectedSlot;
     this->selectedSlot = 0;
 }
 
-void MSH::Handler::update(uint64_t currMillis) {
+void ServoHandler::update(uint64_t currMillis) {
     if (not this->lockSettings)
         return;
 
@@ -119,17 +119,17 @@ void MSH::Handler::update(uint64_t currMillis) {
             return;
     }
 
-    this->applySetting();
+    this->applySetting(currMillis);
 }
 
-void MSH::Handler::setRepeat(bool value) {
+void ServoHandler::setRepeat(bool value) {
     this->repeat = value;
 }
 
 // private methods
 
-void MSH::Handler::applySetting(void) {
-    Motion* currSet = this->MoveSet[this->selectedSlot];
+void ServoHandler::applySetting(uint64_t currMillis) {
+    Lib::Motion* currSet = this->MoveSet[this->selectedSlot];
 
     uint8_t availableList = 0;
     uint8_t doneList = 0;
@@ -155,4 +155,4 @@ void MSH::Handler::applySetting(void) {
             this->selectedSlot++;
 }
 
-// End of  <MSH::Handler>
+// End of  <ServoHandler>

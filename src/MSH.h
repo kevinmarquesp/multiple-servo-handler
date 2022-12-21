@@ -5,7 +5,7 @@
 #include <Servo.h>
 
 
-namespace MSH {
+namespace Lib {
     typedef struct Motion {
         bool available = false;
         uint8_t deg;
@@ -24,32 +24,32 @@ namespace MSH {
 
         void validateDegValue(uint8_t *deg);
     };
+} // namespace Lib
 
-    class Handler {
-    public:
-        ServoAlt* Motor;
+class ServoHandler {
+public:
+    Lib::ServoAlt* Motor;
 
-        Handler(uint8_t amount, uint8_t* minDeg, uint8_t* maxDeg);
-        void attachAll(uint8_t* pins);
-        void detachAll();
-        void moveSlots(uint8_t mvAmt);
-        void set(uint8_t motor, uint8_t deg, uint16_t sleep);
-        void load(void);
-        void isReady(void);
-        void update(uint64_t currMillis);
-        void setRepeat(bool value);
+    ServoHandler(uint8_t amount, uint8_t* minDeg, uint8_t* maxDeg);
+    void attachAll(uint8_t* pins);
+    void detachAll();
+    void moveSlots(uint8_t mvAmt);
+    void set(uint8_t motor, uint8_t deg, uint16_t sleep);
+    void load(void);
+    void isReady(void);
+    void update(uint64_t currMillis);
+    void setRepeat(bool value);
 
-    private:
-        bool lockSettings;
-        bool repeat;
-        uint8_t amt;
-        uint8_t alocatedSlots;
-        uint8_t selectedSlot;
-        Motion* MemSlot;
-        Motion** MoveSet;
+private:
+    bool lockSettings;
+    bool repeat;
+    uint8_t amt;
+    uint8_t alocatedSlots;
+    uint8_t selectedSlot;
+    Lib::Motion* MemSlot;
+    Lib::Motion** MoveSet;
 
-        void applySetting(void);
-    };
-} // namespace MSH
+    void applySetting(uint64_t currMillis);
+};
 
 #endif
