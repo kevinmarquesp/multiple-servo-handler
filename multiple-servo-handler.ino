@@ -17,6 +17,7 @@ void setup(void) {
     // -----------------
     Arm.attachAll(pins);
     Arm.moveSlots(MOVES);
+    Arm.setRepeat(true);
     // -----------------
     Arm.set(0, 180, 10);
     Arm.set(1, 180, 10);
@@ -26,9 +27,12 @@ void setup(void) {
     Arm.set(1, 0, 0);
     Arm.set(2, 0, 0);
     Arm.load();
+    Arm.set(0, 180, 10);
+    Arm.set(1, 180, 10);
+    Arm.set(2, 180, 10);
+    Arm.load();
     // -----------------
     Arm.isReady();
-    Arm.setRepeat(true);
     // -----------------
 }
 

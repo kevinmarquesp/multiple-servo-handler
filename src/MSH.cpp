@@ -47,15 +47,10 @@ void MSH::ServoAlt::validateDegValue(uint8_t* deg) {
 // <MSH::Handler> -> constructor
 
 MSH::Handler::Handler(uint8_t amt, uint8_t* minDeg, uint8_t* maxDeg) {
-    this->Motor = new ServoAlt[amt];
-    this->MemSlot = new Motion[amt];
-
-    this->repeat = false;
     this->amt = amt;
 
-    this->alocatedSlots = 0;
-    this->selectedSlot = 0;
-    this->alocatedSlots = 0;
+    this->Motor = new ServoAlt[amt];
+    this->MemSlot = new Motion[amt];
 
     for (uint8_t i = 0; i < amt; i++) 
         this->Motor[i].setupValues(minDeg[i], maxDeg[i]);
@@ -64,15 +59,14 @@ MSH::Handler::Handler(uint8_t amt, uint8_t* minDeg, uint8_t* maxDeg) {
 // public methods
 
 void MSH::Handler::attachAll(uint8_t* pins) {
-    for (uint8_t i = 0; i < this->amt; i++) {
+    for (uint8_t i = 0; i < this->amt; i++)
         this->Motor[i].attach(pins[i]);
-    }
 }
 
 void MSH::Handler::detachAll(void) {
-    for (uint8_t i = 0; i < this->amt; i++) {
+    uint8_t i;
+    for (uint8_t i = 0; i < this->amt; i++)
         this->Motor[i].detach();
-    }
 }
 
 void MSH::Handler::moveSlots(uint8_t mvAmt) {
@@ -84,21 +78,20 @@ void MSH::Handler::moveSlots(uint8_t mvAmt) {
 }
 
 void MSH::Handler::set(uint8_t motor, uint8_t deg, uint16_t sleep) {
-    if (not this->lockSettings) {
-        Motion setting;
+    if (this->lockSettings)
+        return;
 
-        setting.available = true;
-        setting.deg = deg;
-        setting.sleep = sleep;
+    Motion setting;
 
-        this->MemSlot[motor] = setting;
-    }
+    setting.available = true;
+    setting.deg = deg;
+    setting.sleep = sleep;
+
+    this->MemSlot[motor] = setting;
 }
 
 void MSH::Handler::load(void) {
-    Serial.println(this->alocatedSlots);
-
-    if (this->lockSettings)
+    if (this->lockSettings or this->selectedSlot >= this->alocatedSlots)
         return;
 
     for (uint8_t i = 0; i < this->amt; i++) {
@@ -126,15 +119,17 @@ void MSH::Handler::update(uint64_t currMillis) {
             return;
     }
 
-    uint8_t availableList = 0;
-    uint8_t doneList = 0;
     Motion* currSet = this->MoveSet[this->selectedSlot];
 
-    for (uint8_t i = 0; i < this->amt; i++)
+    uint8_t availableList = 0;
+    uint8_t doneList = 0;
+    uint8_t i;
+
+    for (i = 0; i < this->amt; i++)
         if (currSet[i].available)
             availableList++;
 
-    for (uint8_t i = 0; i < this->amt; i++) {
+    for (i = 0; i < this->amt; i++) {
         if (currSet[i].available) {
             if (this->Motor[i].read() == currSet[i].deg)
                 doneList++;
