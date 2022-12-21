@@ -18,13 +18,13 @@ void setup(void) {
     Arm.attachAll(pins);
     Arm.moveSlots(MOVES);
     // -----------------
-    Arm.set(0, 180, 5);
+    Arm.set(0, 180, 10);
     Arm.set(1, 180, 10);
-    Arm.set(2, 180, 5);
+    Arm.set(2, 180, 10);
     Arm.load();
-    Arm.set(0, 0, 5);
-    Arm.set(1, 0, 10);
-    Arm.set(2, 0, 5);
+    Arm.set(0, 0, 0);
+    Arm.set(1, 0, 0);
+    Arm.set(2, 0, 0);
     Arm.load();
     // -----------------
     Arm.isReady();

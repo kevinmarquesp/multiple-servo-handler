@@ -7,34 +7,25 @@
 void MSH::ServoAlt::setupValues(uint8_t min, uint8_t max) {
     this->min = min;
     this->max = max;
-
-    this->isDone = true;
-    this->process = 0;
-
     this->write(min);
 }
 
-void MSH::ServoAlt::move(uint64_t procMillis, uint8_t deg, uint16_t sleep = 0) {
-    this->isDone = false;
-
+void MSH::ServoAlt::move(uint64_t procMillis, uint8_t deg, uint16_t sleep) {
     this->validateDegValue(&deg);
+
+    if (not sleep)
+        this->write(deg);
+
     uint8_t currPos = this->read();
 
-    if (not sleep) {
-        this->write(deg);
+    if (deg == currPos)
         return;
-
-    } else if (deg == currPos) {
-        this->isDone = true;
-        return;
-    }
 
     if (procMillis - this->process >= sleep) {
         this->process = procMillis;
 
         if (deg > currPos)
             currPos++;
-
         else if (deg < currPos)
             currPos--;
 
@@ -47,7 +38,6 @@ void MSH::ServoAlt::move(uint64_t procMillis, uint8_t deg, uint16_t sleep = 0) {
 void MSH::ServoAlt::validateDegValue(uint8_t* deg) {
     if (*deg < this->min)
         *deg = this->min;
-
     else if (*deg > this->max)
         *deg = this->max;
 }

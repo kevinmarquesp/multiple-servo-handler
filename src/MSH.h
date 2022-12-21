@@ -14,8 +14,6 @@ namespace MSH {
 
     class ServoAlt: public Servo {
     public:
-        bool isDone;
-
         void setupValues(uint8_t min, uint8_t max);
         void move(uint64_t procMillis, uint8_t deg, uint16_t sleep = 0);
 
