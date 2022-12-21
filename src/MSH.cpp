@@ -119,32 +119,40 @@ void MSH::Handler::update(uint64_t currMillis) {
             return;
     }
 
+    this->applySetting();
+}
+
+void MSH::Handler::setRepeat(bool value) {
+    this->repeat = value;
+}
+
+// private methods
+
+void MSH::Handler::applySetting(void) {
     Motion* currSet = this->MoveSet[this->selectedSlot];
 
     uint8_t availableList = 0;
     uint8_t doneList = 0;
     uint8_t i;
 
+    // Count how many servos are available to move in the setting array
     for (i = 0; i < this->amt; i++)
         if (currSet[i].available)
             availableList++;
 
     for (i = 0; i < this->amt; i++) {
         if (currSet[i].available) {
-            if (this->Motor[i].read() == currSet[i].deg)
+            if (this->Motor[i].read() == currSet[i].deg) // If this servo is done
                 doneList++;
             else
                 this->Motor[i].move(currMillis, currSet[i].deg, currSet[i].sleep);
         }
     }
 
+    // If every servo available was done
     if (availableList == doneList)
         if (this->selectedSlot < this->alocatedSlots)
             this->selectedSlot++;
-}
-
-void MSH::Handler::setRepeat(bool value) {
-    this->repeat = value;
 }
 
 // End of  <MSH::Handler>

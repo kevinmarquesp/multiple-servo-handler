@@ -47,6 +47,8 @@ namespace MSH {
         uint8_t selectedSlot;
         Motion* MemSlot;
         Motion** MoveSet;
+
+        void applySetting(void);
     };
 } // namespace MSH
 
