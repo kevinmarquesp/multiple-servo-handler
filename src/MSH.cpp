@@ -50,7 +50,7 @@ ServoHandler::ServoHandler(uint8_t amt, uint8_t* minDeg, uint8_t* maxDeg) {
     this->amt = amt;
 
     this->Motor = new Lib::ServoAlt[amt];
-    this->MemSlot = new Lib::Motion[amt];
+    this->MemSlot = new Lib::MotorSetting[amt];
 
     for (uint8_t i = 0; i < amt; i++) 
         this->Motor[i].setupValues(minDeg[i], maxDeg[i]);
@@ -69,19 +69,19 @@ void ServoHandler::detachAll(void) {
         this->Motor[i].detach();
 }
 
-void ServoHandler::moveSlots(uint8_t mvAmt) {
-    this->alocatedSlots = mvAmt;
-    this->MoveSet = new Lib::Motion*[mvAmt];
+void ServoHandler::setAlocatedSlots(uint8_t value) {
+    this->aSlots = value;
+    this->MoveSet = new Lib::MotorSetting*[value];
 
-    for (uint8_t i = 0; i < mvAmt; i++)
-        this->MoveSet[i] = new Lib::Motion[this->amt];
+    for (uint8_t i = 0; i < value; i++)
+        this->MoveSet[i] = new Lib::MotorSetting[this->amt];
 }
 
 void ServoHandler::set(uint8_t motor, uint8_t deg, uint16_t sleep) {
-    if (this->lockSettings)
+    if (this->lock)
         return;
 
-    Lib::Motion setting;
+    Lib::MotorSetting setting;
 
     setting.available = true;
     setting.deg = deg;
@@ -91,30 +91,30 @@ void ServoHandler::set(uint8_t motor, uint8_t deg, uint16_t sleep) {
 }
 
 void ServoHandler::load(void) {
-    if (this->lockSettings or this->selectedSlot >= this->alocatedSlots)
+    if (this->lock or this->sSlot >= this->aSlots)
         return;
 
     for (uint8_t i = 0; i < this->amt; i++) {
-        this->MoveSet[this->selectedSlot][i] = this->MemSlot[i];
+        this->MoveSet[this->sSlot][i] = this->MemSlot[i];
         this->MemSlot[i].available = false;
     }
 
-    this->selectedSlot++;
+    this->sSlot++;
 }
 
-void ServoHandler::isReady(void) {
-    this->lockSettings = true;
-    this->alocatedSlots = this->selectedSlot;
-    this->selectedSlot = 0;
+void ServoHandler::start(void) {
+    this->lock = true;
+    this->aSlots = this->sSlot;
+    this->sSlot = 0;
 }
 
 void ServoHandler::update(uint64_t currMillis) {
-    if (not this->lockSettings)
+    if (not this->lock)
         return;
 
-    if (this->selectedSlot == this->alocatedSlots) {
+    if (this->sSlot == this->aSlots) {
         if (this->repeat)
-            this->selectedSlot = 0;
+            this->sSlot = 0;
         else
             return;
     }
@@ -129,7 +129,7 @@ void ServoHandler::setRepeat(bool value) {
 // private methods
 
 void ServoHandler::applySetting(uint64_t currMillis) {
-    Lib::Motion* currSet = this->MoveSet[this->selectedSlot];
+    Lib::MotorSetting* currSet = this->MoveSet[this->sSlot];
 
     uint8_t availableList = 0;
     uint8_t doneList = 0;
@@ -151,8 +151,8 @@ void ServoHandler::applySetting(uint64_t currMillis) {
 
     // If every servo available was done
     if (availableList == doneList)
-        if (this->selectedSlot < this->alocatedSlots)
-            this->selectedSlot++;
+        if (this->sSlot < this->aSlots)
+            this->sSlot++;
 }
 
 // End of  <ServoHandler>

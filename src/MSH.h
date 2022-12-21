@@ -6,11 +6,11 @@
 
 
 namespace Lib {
-    typedef struct Motion {
+    typedef struct MotorSetting {
         bool available = false;
         uint8_t deg;
         uint16_t sleep;
-    } Motion;
+    } MotorSetting;
 
     class ServoAlt: public Servo {
     public:
@@ -24,7 +24,7 @@ namespace Lib {
 
         void validateDegValue(uint8_t *deg);
     };
-} // namespace Lib
+}
 
 class ServoHandler {
 public:
@@ -32,22 +32,22 @@ public:
 
     ServoHandler(uint8_t amount, uint8_t* minDeg, uint8_t* maxDeg);
     void attachAll(uint8_t* pins);
-    void detachAll();
-    void moveSlots(uint8_t mvAmt);
+    void setRepeat(bool value);
+    void setAlocatedSlots(uint8_t value);
+    void detachAll(void);
     void set(uint8_t motor, uint8_t deg, uint16_t sleep);
     void load(void);
-    void isReady(void);
+    void start(void);
     void update(uint64_t currMillis);
-    void setRepeat(bool value);
 
 private:
-    bool lockSettings;
+    bool lock;
     bool repeat;
     uint8_t amt;
-    uint8_t alocatedSlots;
-    uint8_t selectedSlot;
-    Lib::Motion* MemSlot;
-    Lib::Motion** MoveSet;
+    uint8_t aSlots; // Alocated slots
+    uint8_t sSlot;  // Current selected slot
+    Lib::MotorSetting* MemSlot;
+    Lib::MotorSetting** MoveSet;
 
     void applySetting(uint64_t currMillis);
 };
